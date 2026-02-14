@@ -137,8 +137,8 @@ examples/ # tiny dataset & smoke test
 
 ## 📊 Results (KIBA Dataset)
 
-- ROC-AUC ≈ **0.94**  
-- Accuracy ≈ **86%**  
+- ROC-AUC ≈ **0.96**  
+- Accuracy ≈ **89%**  
 - Balanced classification performance  
 
 ---
