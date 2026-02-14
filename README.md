@@ -229,7 +229,8 @@ feature_importance.csv → top features
 
 roc_curve_oof.png → ROC curve
 
-Model artifacts are not included in this repository due to size.
+> ⚠️ Note: Model artifacts are not included in this repository due to their large size.
+> To reproduce the trained models, run the training commands provided above.
 
 🔁 Reproducibility
 
