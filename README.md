@@ -1,111 +1,216 @@
-# Drug–Target Interaction (DTI) Prediction (raw SMILES + raw protein sequence)
+# Drug–Target Interaction (DTI) Prediction System
+### Graduation Project – Faculty of Computers & Information
 
-This project trains explainable baseline and advanced ML models to predict whether a **drug molecule** interacts with a **protein target** using only:
-
-- `compound_iso_smiles` (SMILES string)
-- `target_sequence` (amino-acid sequence)
-- `label` (0/1 interaction)
-
-No precomputed/pre-engineered features are assumed: **all featurization is implemented here**.
+An end-to-end machine learning system for predicting **drug–protein interactions** directly from raw molecular SMILES and protein amino-acid sequences.
 
 ---
 
-## Why these representations?
+## 🚀 Overview
 
-### Drug (from SMILES via RDKit)
+This project trains explainable baseline and advanced machine learning models to predict whether a **drug molecule interacts with a protein target** using only:
 
-- **RDKit molecular descriptors (interpretable, global properties)**  
-  Examples: molecular weight, LogP, H-bond donors/acceptors, TPSA, rotatable bonds, ring count, fraction Csp3.  
-  These are low-dimensional, human-interpretable signals that often correlate with binding likelihood.
+- `compound_iso_smiles` → molecular structure  
+- `target_sequence` → amino-acid sequence  
+- `label` → interaction (0 / 1)
 
-- **Morgan fingerprint (ECFP-like, local substructure signal)**  
-  We compute a fixed-length binary vector (default 2048 bits) with radius 2.  
-  This captures local chemical environments/substructures and is a standard baseline in cheminformatics.
+No precomputed features are assumed — **all feature engineering is implemented within this repository**.
 
-### Protein (from amino-acid sequence)
+The system is designed for:
 
-- **Amino-acid composition (AAC, interpretable global signal)**  
-  A 20-dim vector: fraction of each amino acid in the sequence.  
-  This captures coarse properties (e.g., enrichment of hydrophobic/polar residues).
-
-- **Hashed k-mer counts (captures local motifs, controlled dimensionality)**  
-  We count k-mers (default k=3) and map them into a fixed-dimensional vector (default 1024) using a hashing trick.  
-  This approximates a bag-of-k-mers representation without exploding dimensionality (since \(20^k\) grows fast).
+✔ scientific correctness  
+✔ reproducibility  
+✔ scalability  
+✔ deployment readiness  
 
 ---
 
-## Project structure
+## 🎓 Project Context
 
-- `dti/`
-  - `io.py`: dataset loading + validation
-  - `features/`
-    - `drug.py`: RDKit descriptors + Morgan fingerprints
-    - `protein.py`: AAC + hashed k-mer encoding
-    - `dti.py`: concatenation + feature-name management
-  - `preprocess.py`: scaling only continuous features (keeps fingerprints as 0/1)
-  - `models.py`: model factory (LogReg, RF, XGBoost or MLP) + class-imbalance handling
-  - `eval.py`: metrics + stratified cross-validation + reporting
-- `train.py`: CLI for training/evaluating and saving artifacts
+This system was developed as a **graduation project** focusing on:
 
-Artifacts are saved under `--outdir`:
-
-- `model.joblib`: full pipeline (featurization + preprocessing + classifier)
-- `report.json`: metrics summary (CV means/std, dataset stats)
-- `feature_importance.csv`: top features (if applicable)
+- AI in drug discovery & bioinformatics  
+- feature extraction from biological data  
+- machine learning pipeline engineering  
+- model evaluation & deployment  
+- building a reproducible ML workflow  
 
 ---
 
-## Setup
+## 🧬 Why These Representations?
 
-### Option A (recommended on Windows): Conda + RDKit
+### 🧪 Drug Representation (from SMILES via RDKit)
 
-Create the environment from `environment.yml`:
+#### ✔ RDKit molecular descriptors (interpretable, global properties)
+Examples:
+
+- Molecular weight  
+- LogP  
+- H-bond donors/acceptors  
+- TPSA  
+- Rotatable bonds  
+- Ring count  
+- Fraction Csp3  
+
+These low-dimensional descriptors provide human-interpretable signals often correlated with binding likelihood.
+
+#### ✔ Morgan fingerprint (ECFP-like, local substructure signal)
+
+- Radius = 2  
+- Default length = 2048 bits  
+- Captures local chemical environments & substructures  
+- Standard baseline in cheminformatics  
+
+---
+
+### 🧫 Protein Representation (from amino-acid sequence)
+
+#### ✔ Amino-acid composition (AAC, interpretable global signal)
+
+A 20-dimensional vector representing the fraction of each amino acid.  
+Captures coarse biochemical properties such as hydrophobicity and polarity.
+
+#### ✔ Hashed k-mer counts (local motif representation)
+
+- Default k = 3  
+- Fixed dimensionality (default = 1024)  
+- Captures local sequence motifs  
+- Uses hashing to avoid exponential growth of \(20^k\)
+
+---
+
+## ⚙️ Final Feature Vector
+
+[drug_descriptors | drug_fingerprint | protein_AAC | protein_kmer_hash]
+
+
+Feature names are preserved for interpretability and importance analysis.
+
+---
+
+## 🧠 Machine Learning Models
+
+Implemented models:
+
+- Logistic Regression (baseline)
+- Random Forest
+- XGBoost
+- Multi-Layer Perceptron (MLP)
+
+### Handling Class Imbalance
+
+- `class_weight` (LogReg & RF)  
+- `scale_pos_weight` (XGBoost)  
+- sample weighting (MLP)
+
+---
+
+## 📊 Scientific & Engineering Best Practices
+
+✔ Invalid SMILES & sequences detected and reported  
+✔ Leakage-safe scaling using sklearn pipelines  
+✔ Stratified cross-validation  
+✔ Reproducible training with fixed seeds  
+✔ Feature importance reporting  
+✔ Modular & reusable pipeline design  
+
+---
+
+## 📁 Project Structure
+
+dti/
+├── io.py # dataset loading & validation
+├── utils.py
+├── preprocess.py # scaling logic
+├── models.py # model factory & imbalance handling
+├── eval.py # metrics & cross-validation
+└── features/
+├── drug.py # RDKit descriptors & fingerprints
+├── protein.py # AAC & k-mer encoding
+└── dti.py # feature concatenation
+
+train.py # CLI training & evaluation
+api.py # FastAPI inference service
+examples/ # tiny dataset & smoke test
+
+
+---
+
+## 📊 Results (KIBA Dataset)
+
+- ROC-AUC ≈ **0.94**  
+- Accuracy ≈ **86%**  
+- Balanced classification performance  
+
+---
+
+## 🌐 API Inference
+
+Start the API:
 
 ```bash
+uvicorn api:app --reload
+Example Request
+POST /predict
+
+{
+  "compound_iso_smiles": "CC(=O)OC1=CC=CC=C1C(=O)O",
+  "target_sequence": "MVKVYAPASSANMSVGFDVLGAAVTPVDGALLGDVVTVEAAETFSLNNLGQKLTKELGADVVV"
+}
+Example Response
+{
+  "probability": 0.91,
+  "label": 1
+}
+⚙️ Setup
+✅ Recommended (Windows): Conda + RDKit
 conda env create -f environment.yml
 conda activate dti
-```
-
-### Option B: pip (may fail for RDKit on Windows)
-
-```bash
+Alternative (pip)
 pip install -r requirements.txt
-```
+RDKit installation via pip may fail on Windows.
 
----
-
-## Data format
-
+📄 Data Format
 Input CSV must contain:
 
-- `compound_iso_smiles`
-- `target_sequence`
-- `label` (0/1)
+compound_iso_smiles
 
-Optional columns are allowed (e.g., `affinity`).
+target_sequence
 
----
+label (0/1)
 
-## Train + evaluate
+Optional columns (e.g., affinity) are supported.
 
-```bash
-python train.py --data path\to\data.csv --outdir runs\baseline_logreg --model logreg
-python train.py --data path\to\data.csv --outdir runs\baseline_rf --model rf
-python train.py --data path\to\data.csv --outdir runs\advanced_xgb --model xgb
-```
+🏋️ Train & Evaluate
+python train.py --data path\to\data.csv --outdir runs\logreg --model logreg
+python train.py --data path\to\data.csv --outdir runs\rf --model rf
+python train.py --data path\to\data.csv --outdir runs\xgb --model xgb
+Useful Options
+--cv 5 → cross validation folds
 
-Key options:
+--seed 42 → reproducibility
 
-- `--cv 5`: stratified CV folds
-- `--seed 42`: reproducibility
-- `--drop_invalid`: drop rows with invalid SMILES/sequence (recommended for correctness)
-- `--kmer_k 3 --kmer_dim 1024`: protein k-mer hashing settings
+--drop_invalid → remove invalid inputs
 
----
+--kmer_k 3 --kmer_dim 1024 → protein encoding settings
 
-## Notes on scientific correctness
+📦 Model Artifacts
+Artifacts saved to --outdir:
 
-- **Invalid inputs**: invalid SMILES or sequences are detected and (by default) removed, and counts are reported.
-- **Leakage-safe scaling**: scalers are fit **inside each CV fold** via scikit-learn pipelines.
-- **Class imbalance**: handled via `class_weight` (LogReg/RF), `scale_pos_weight` (XGBoost), or sample weights (MLP).
+model.joblib → full pipeline
 
+report.json → metrics & dataset stats
+
+feature_importance.csv → top features
+
+roc_curve_oof.png → ROC curve
+
+Model artifacts are not included in this repository due to size.
+
+🔁 Reproducibility
+To reproduce results:
+
+python train.py --data your_dataset.csv --model rf --cv 5
+🧪 Example Dataset
+A small dataset for testing:
+
+examples/tiny_dti.csv
