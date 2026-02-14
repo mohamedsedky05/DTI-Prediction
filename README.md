@@ -168,6 +168,8 @@ Example Response
 probability → likelihood of interaction
 label → 1 = interaction predicted, 0 = no interaction
 
+---
+
 ## ⚙️ Setup
 ✅ Recommended (Windows): Conda + RDKit
 conda env create -f environment.yml
@@ -187,6 +189,8 @@ label (0/1)
 
 Optional columns (e.g., affinity) are supported.
 
+---
+
 ## 🏋️ Train & Evaluate
 python train.py --data path\to\data.csv --outdir runs\logreg --model logreg
 python train.py --data path\to\data.csv --outdir runs\rf --model rf
@@ -199,6 +203,8 @@ Useful Options
 --drop_invalid → remove invalid inputs
 
 --kmer_k 3 --kmer_dim 1024 → protein encoding settings
+
+---
 
 ## 📦 Model Artifacts
 Artifacts saved to --outdir:
@@ -213,10 +219,15 @@ roc_curve_oof.png → ROC curve
 
 Model artifacts are not included in this repository due to size.
 
+---
+
 ## 🔁 Reproducibility
 To reproduce results:
 
 python train.py --data your_dataset.csv --model rf --cv 5
+
+---
+
 ## 🧪 Example Dataset
 A small dataset for testing:
 
