@@ -149,9 +149,13 @@ Start the API:
 
 ```bash
 uvicorn api:app --reload
-Example Request
+Base URL:
+
+http://localhost:8000
+Endpoint
 POST /predict
 
+Example Request
 {
   "compound_iso_smiles": "CC(=O)OC1=CC=CC=C1C(=O)O",
   "target_sequence": "MVKVYAPASSANMSVGFDVLGAAVTPVDGALLGDVVTVEAAETFSLNNLGQKLTKELGADVVV"
@@ -161,7 +165,10 @@ Example Response
   "probability": 0.91,
   "label": 1
 }
-⚙️ Setup
+probability → likelihood of interaction
+label → 1 = interaction predicted, 0 = no interaction
+
+## ⚙️ Setup
 ✅ Recommended (Windows): Conda + RDKit
 conda env create -f environment.yml
 conda activate dti
@@ -180,7 +187,7 @@ label (0/1)
 
 Optional columns (e.g., affinity) are supported.
 
-🏋️ Train & Evaluate
+## 🏋️ Train & Evaluate
 python train.py --data path\to\data.csv --outdir runs\logreg --model logreg
 python train.py --data path\to\data.csv --outdir runs\rf --model rf
 python train.py --data path\to\data.csv --outdir runs\xgb --model xgb
@@ -193,7 +200,7 @@ Useful Options
 
 --kmer_k 3 --kmer_dim 1024 → protein encoding settings
 
-📦 Model Artifacts
+## 📦 Model Artifacts
 Artifacts saved to --outdir:
 
 model.joblib → full pipeline
@@ -206,11 +213,11 @@ roc_curve_oof.png → ROC curve
 
 Model artifacts are not included in this repository due to size.
 
-🔁 Reproducibility
+## 🔁 Reproducibility
 To reproduce results:
 
 python train.py --data your_dataset.csv --model rf --cv 5
-🧪 Example Dataset
+## 🧪 Example Dataset
 A small dataset for testing:
 
 examples/tiny_dti.csv
