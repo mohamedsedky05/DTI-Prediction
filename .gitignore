@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.virtual_documents/
+anaconda_projects/
+runs/
+*.joblib
+kiba_with_label.csv
